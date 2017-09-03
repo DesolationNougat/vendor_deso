@@ -11,7 +11,7 @@ fi
 # sync-paths file was obtained using this command
 # grep -r 'remote="deso"' ./manifest | sed 's/" remote.*//' | sed 's/.*path="//' >> vendor/deso/sync-paths 
 
-for line in $(cat vendor/deso/sync-paths) ; do
+for line in $(grep -r 'remote="deso"' ./manifest | sed 's/" remote.*//' | sed 's/.*path="//') ; do
     cd $line
     repo-compare $line deso n
     #echo $PWD
