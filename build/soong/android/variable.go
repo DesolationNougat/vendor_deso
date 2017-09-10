@@ -1,4 +1,4 @@
-package android
+﻿package android
 type Product_variables struct {
 }
 

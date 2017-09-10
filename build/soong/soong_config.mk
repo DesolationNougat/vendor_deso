@@ -1,4 +1,4 @@
-lineage_soong:
+﻿lineage_soong:
 	$(hide) mkdir -p $(dir $@)
 	$(hide) (\
 	echo '{'; \

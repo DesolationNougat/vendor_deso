@@ -1,4 +1,4 @@
-PRODUCT_BRAND ?= LineageOS
+PRODUCT_BRAND ?= DesolationROM
 
 PRODUCT_BUILD_PROP_OVERRIDES += BUILD_UTC_DATE=0
 
@@ -26,9 +26,11 @@ ifneq ($(TARGET_BUILD_VARIANT),user)
 PRODUCT_PROPERTY_OVERRIDES += persist.sys.dun.override=0
 endif
 
+ifneq ($(TARGET_BUILD_VARIANT),userdebug)
 ifneq ($(TARGET_BUILD_VARIANT),eng)
 # Enable ADB authentication
-PRODUCT_DEFAULT_PROPERTY_OVERRIDES += ro.adb.secure=1
+ADDITIONAL_DEFAULT_PROPERTIES += ro.adb.secure=1
+endif
 endif
 
 ifeq ($(BOARD_CACHEIMAGE_FILE_SYSTEM_TYPE),)
@@ -41,37 +43,32 @@ endif
 
 # Backup Tool
 PRODUCT_COPY_FILES += \
-    vendor/lineage/prebuilt/common/bin/backuptool.sh:install/bin/backuptool.sh \
-    vendor/lineage/prebuilt/common/bin/backuptool.functions:install/bin/backuptool.functions \
-    vendor/lineage/prebuilt/common/bin/50-lineage.sh:system/addon.d/50-lineage.sh \
-    vendor/lineage/prebuilt/common/bin/blacklist:system/addon.d/blacklist
+    vendor/deso/prebuilt/common/bin/backuptool.sh:install/bin/backuptool.sh \
+    vendor/deso/prebuilt/common/bin/backuptool.functions:install/bin/backuptool.functions \
+    vendor/deso/prebuilt/common/bin/50-deso.sh:system/addon.d/50-deso.sh \
+    vendor/deso/prebuilt/common/bin/blacklist:system/addon.d/blacklist
 
 # Backup Services whitelist
 PRODUCT_COPY_FILES += \
-    vendor/lineage/config/permissions/backup.xml:system/etc/sysconfig/backup.xml
-
-# Signature compatibility validation
-PRODUCT_COPY_FILES += \
-    vendor/lineage/prebuilt/common/bin/otasigcheck.sh:install/bin/otasigcheck.sh
+    vendor/deso/config/permissions/backup.xml:system/etc/sysconfig/backup.xml
 
 # init.d support
 PRODUCT_COPY_FILES += \
-    vendor/lineage/prebuilt/common/etc/init.d/00banner:system/etc/init.d/00banner \
-    vendor/lineage/prebuilt/common/bin/sysinit:system/bin/sysinit
+    vendor/deso/prebuilt/common/bin/sysinit:system/bin/sysinit
 
 ifneq ($(TARGET_BUILD_VARIANT),user)
 # userinit support
 PRODUCT_COPY_FILES += \
-    vendor/lineage/prebuilt/common/etc/init.d/90userinit:system/etc/init.d/90userinit
+    vendor/deso/prebuilt/common/etc/init.d/90userinit:system/etc/init.d/90userinit
 endif
 
-# Lineage-specific init file
+# Desolation specific init file
 PRODUCT_COPY_FILES += \
-    vendor/lineage/prebuilt/common/etc/init.local.rc:root/init.lineage.rc
+    vendor/deso/prebuilt/common/etc/init.local.rc:root/init.deso.rc
 
 # Copy over added mimetype supported in libcore.net.MimeUtils
 PRODUCT_COPY_FILES += \
-    vendor/lineage/prebuilt/common/lib/content-types.properties:system/lib/content-types.properties
+    vendor/deso/prebuilt/common/lib/content-types.properties:system/lib/content-types.properties
 
 # Enable SIP+VoIP on all targets
 PRODUCT_COPY_FILES += \
@@ -81,101 +78,48 @@ PRODUCT_COPY_FILES += \
 PRODUCT_COPY_FILES += \
     frameworks/base/data/keyboards/Vendor_045e_Product_028e.kl:system/usr/keylayout/Vendor_045e_Product_0719.kl
 
-# This is Lineage!
-PRODUCT_COPY_FILES += \
-    vendor/lineage/config/permissions/com.cyanogenmod.android.xml:system/etc/permissions/com.cyanogenmod.android.xml
-
-# Include Lineage audio files
-include vendor/lineage/config/lineage_audio.mk
-
-ifneq ($(TARGET_DISABLE_CMSDK), true)
-# CMSDK
-include vendor/lineage/config/cmsdk_common.mk
-endif
+# Include Desolation audio files
+include vendor/deso/config/deso_audio.mk
 
 # TWRP
 ifeq ($(WITH_TWRP),true)
-include vendor/lineage/config/twrp.mk
+include vendor/deso/config/twrp.mk
 endif
 
-# Bootanimation
+# Required packages
 PRODUCT_PACKAGES += \
-    bootanimation.zip
-
-# Required Lineage packages
-PRODUCT_PACKAGES += \
-    BluetoothExt \
-    CMAudioService \
-    CMParts \
-    Development \
-    Profiles \
-    WeatherManagerService
+    BluetoothExt
 
 # Optional packages
 PRODUCT_PACKAGES += \
     libemoji \
-    LiveWallpapersPicker \
-    PhotoTable \
-    Terminal
+    LiveWallpapersPicker
 
 # Include explicitly to work around GMS issues
 PRODUCT_PACKAGES += \
     libprotobuf-cpp-full \
     librsjni
 
-# Custom Lineage packages
+# Custom packages
 PRODUCT_PACKAGES += \
-    AudioFX \
-    CMSettingsProvider \
-    LineageSetupWizard \
-    Eleven \
     ExactCalculator \
-    Jelly \
-    LockClock \
-    Trebuchet \
-    Updater \
-    WallpaperPicker \
-    WeatherProvider
+    Gallery2
 
 # Exchange support
 PRODUCT_PACKAGES += \
     Exchange2
 
-# Extra tools in Lineage
+# Extra tools
 PRODUCT_PACKAGES += \
-    7z \
-    bash \
-    bzip2 \
-    curl \
-    fsck.ntfs \
-    gdbserver \
-    htop \
-    lib7z \
     libsepol \
+    gdbserver \
     micro_bench \
     mke2fs \
-    mkfs.ntfs \
-    mount.ntfs \
     oprofiled \
-    pigz \
     powertop \
     sqlite3 \
     strace \
-    tune2fs \
-    unrar \
-    unzip \
-    vim \
-    wget \
-    zip
-
-# Custom off-mode charger
-ifneq ($(WITH_LINEAGE_CHARGER),false)
-PRODUCT_PACKAGES += \
-    charger_res_images \
-    lineage_charger_res_images \
-    font_log.png \
-    libhealthd.lineage
-endif
+    tune2fs
 
 # ExFAT support
 WITH_EXFAT ?= true
@@ -187,30 +131,6 @@ PRODUCT_PACKAGES += \
     mkfs.exfat
 endif
 
-# Openssh
-PRODUCT_PACKAGES += \
-    scp \
-    sftp \
-    ssh \
-    sshd \
-    sshd_config \
-    ssh-keygen \
-    start-ssh
-
-# rsync
-PRODUCT_PACKAGES += \
-    rsync
-
-# Stagefright FFMPEG plugin
-PRODUCT_PACKAGES += \
-    libffmpeg_extractor \
-    libffmpeg_omx \
-    media_codecs_ffmpeg.xml
-
-PRODUCT_PROPERTY_OVERRIDES += \
-    media.sf.omx-plugin=libffmpeg_omx.so \
-    media.sf.extractor-plugin=libffmpeg_extractor.so
-
 # Storage manager
 PRODUCT_PROPERTY_OVERRIDES += \
     ro.storage_manager.enabled=true
@@ -220,138 +140,129 @@ ifneq ($(TARGET_BUILD_VARIANT),user)
 PRODUCT_PACKAGES += \
     procmem \
     procrank
+endif
 
-# Conditionally build in su
-ifeq ($(WITH_SU),true)
-PRODUCT_PACKAGES += \
-    su
+DEVICE_PACKAGE_OVERLAYS += vendor/deso/overlay/common
+
+# Boot animation
+ifneq ($(TARGET_SCREEN_WIDTH) $(TARGET_SCREEN_HEIGHT),$(space))
+
+# determine the smaller dimension
+TARGET_BOOTANIMATION_SIZE := $(shell \
+  if [ $(TARGET_SCREEN_WIDTH) -lt $(TARGET_SCREEN_HEIGHT) ]; then \
+    echo $(TARGET_SCREEN_WIDTH); \
+  else \
+    echo $(TARGET_SCREEN_HEIGHT); \
+  fi )
+
+# get a sorted list of the sizes
+bootanimation_sizes := $(subst .zip,, $(shell ls vendor/deso/prebuilt/common/bootanimation))
+bootanimation_sizes := $(shell echo -e $(subst $(space),'\n',$(bootanimation_sizes)) | sort -rn)
+
+# find the appropriate size and set
+define check_and_set_bootanimation
+$(eval TARGET_BOOTANIMATION_NAME := $(shell \
+  if [ -z "$(TARGET_BOOTANIMATION_NAME)" ]; then
+    if [ $(1) -le $(TARGET_BOOTANIMATION_SIZE) ]; then \
+      echo $(1); \
+      exit 0; \
+    fi;
+  fi;
+  echo $(TARGET_BOOTANIMATION_NAME); ))
+endef
+$(foreach size,$(bootanimation_sizes), $(call check_and_set_bootanimation,$(size)))
+
+ifeq ($(TARGET_BOOTANIMATION_HALF_RES),true)
+PRODUCT_COPY_FILES += \
+    vendor/deso/prebuilt/common/bootanimation/halfres/$(TARGET_BOOTANIMATION_NAME).zip:system/media/bootanimation.zip
+else
+PRODUCT_COPY_FILES += \
+    vendor/deso/prebuilt/common/bootanimation/$(TARGET_BOOTANIMATION_NAME).zip:system/media/bootanimation.zip
 endif
 endif
 
-DEVICE_PACKAGE_OVERLAYS += vendor/lineage/overlay/common
-
-PRODUCT_VERSION_MAJOR = 15
+PRODUCT_VERSION_MAJOR = 1
 PRODUCT_VERSION_MINOR = 0
 PRODUCT_VERSION_MAINTENANCE := 0
 
 ifeq ($(TARGET_VENDOR_SHOW_MAINTENANCE_VERSION),true)
-    LINEAGE_VERSION_MAINTENANCE := $(PRODUCT_VERSION_MAINTENANCE)
+    DESO_VERSION_MAINTENANCE := $(PRODUCT_VERSION_MAINTENANCE)
 else
-    LINEAGE_VERSION_MAINTENANCE := 0
-endif
-
-# Set LINEAGE_BUILDTYPE from the env RELEASE_TYPE, for jenkins compat
-
-ifndef LINEAGE_BUILDTYPE
-    ifdef RELEASE_TYPE
-        # Starting with "LINEAGE_" is optional
-        RELEASE_TYPE := $(shell echo $(RELEASE_TYPE) | sed -e 's|^LINEAGE_||g')
-        LINEAGE_BUILDTYPE := $(RELEASE_TYPE)
-    endif
+    DESO_VERSION_MAINTENANCE := 0
 endif
 
 # Filter out random types, so it'll reset to UNOFFICIAL
-ifeq ($(filter RELEASE NIGHTLY SNAPSHOT EXPERIMENTAL,$(LINEAGE_BUILDTYPE)),)
-    LINEAGE_BUILDTYPE :=
+ifeq ($(filter RELEASE NIGHTLY SNAPSHOT EXPERIMENTAL,$(DESO_BUILDTYPE)),)
+    DESO_BUILDTYPE :=
 endif
 
-ifdef LINEAGE_BUILDTYPE
-    ifneq ($(LINEAGE_BUILDTYPE), SNAPSHOT)
-        ifdef LINEAGE_EXTRAVERSION
+ifdef DESO_BUILDTYPE
+    ifneq ($(DESO_BUILDTYPE), SNAPSHOT)
+        ifdef DESO_EXTRAVERSION
             # Force build type to EXPERIMENTAL
-            LINEAGE_BUILDTYPE := EXPERIMENTAL
-            # Remove leading dash from LINEAGE_EXTRAVERSION
-            LINEAGE_EXTRAVERSION := $(shell echo $(LINEAGE_EXTRAVERSION) | sed 's/-//')
-            # Add leading dash to LINEAGE_EXTRAVERSION
-            LINEAGE_EXTRAVERSION := -$(LINEAGE_EXTRAVERSION)
+            DESO_BUILDTYPE := EXPERIMENTAL
+            # Remove leading dash from DESO_EXTRAVERSION
+            DESO_EXTRAVERSION := $(shell echo $(DESO_EXTRAVERSION) | sed 's/-//')
+            # Add leading dash to DESO_EXTRAVERSION
+            DESO_EXTRAVERSION := -$(DESO_EXTRAVERSION)
         endif
     else
-        ifndef LINEAGE_EXTRAVERSION
+        ifndef DESO_EXTRAVERSION
             # Force build type to EXPERIMENTAL, SNAPSHOT mandates a tag
-            LINEAGE_BUILDTYPE := EXPERIMENTAL
+            DESO_BUILDTYPE := EXPERIMENTAL
         else
-            # Remove leading dash from LINEAGE_EXTRAVERSION
-            LINEAGE_EXTRAVERSION := $(shell echo $(LINEAGE_EXTRAVERSION) | sed 's/-//')
-            # Add leading dash to LINEAGE_EXTRAVERSION
-            LINEAGE_EXTRAVERSION := -$(LINEAGE_EXTRAVERSION)
+            # Remove leading dash from DESO_EXTRAVERSION
+            DESO_EXTRAVERSION := $(shell echo $(DESO_EXTRAVERSION) | sed 's/-//')
+            # Add leading dash to DESO_EXTRAVERSION
+            DESO_EXTRAVERSION := -$(DESO_EXTRAVERSION)
         endif
     endif
 else
-    # If LINEAGE_BUILDTYPE is not defined, set to UNOFFICIAL
-    LINEAGE_BUILDTYPE := UNOFFICIAL
-    LINEAGE_EXTRAVERSION :=
+    # If DESO_BUILDTYPE is not defined, set to UNOFFICIAL
+    DESO_BUILDTYPE := UNOFFICIAL
+    DESO_EXTRAVERSION :=
 endif
 
-ifeq ($(LINEAGE_BUILDTYPE), UNOFFICIAL)
+ifeq ($(DESO_BUILDTYPE), UNOFFICIAL)
     ifneq ($(TARGET_UNOFFICIAL_BUILD_ID),)
-        LINEAGE_EXTRAVERSION := -$(TARGET_UNOFFICIAL_BUILD_ID)
+        DESO_EXTRAVERSION := -$(TARGET_UNOFFICIAL_BUILD_ID)
     endif
 endif
 
-ifeq ($(LINEAGE_BUILDTYPE), RELEASE)
+ifeq ($(DESO_BUILDTYPE), RELEASE)
     ifndef TARGET_VENDOR_RELEASE_BUILD_ID
-        LINEAGE_VERSION := $(PRODUCT_VERSION_MAJOR).$(PRODUCT_VERSION_MINOR).$(PRODUCT_VERSION_MAINTENANCE)$(PRODUCT_VERSION_DEVICE_SPECIFIC)-$(LINEAGE_BUILD)
+        DESO_VERSION := $(PRODUCT_VERSION_MAJOR).$(PRODUCT_VERSION_MINOR).$(PRODUCT_VERSION_MAINTENANCE)$(PRODUCT_VERSION_DEVICE_SPECIFIC)-$(DESO_BUILD)
     else
         ifeq ($(TARGET_BUILD_VARIANT),user)
-            ifeq ($(LINEAGE_VERSION_MAINTENANCE),0)
-                LINEAGE_VERSION := $(PRODUCT_VERSION_MAJOR).$(PRODUCT_VERSION_MINOR)-$(TARGET_VENDOR_RELEASE_BUILD_ID)-$(LINEAGE_BUILD)
+            ifeq ($(DESO_VERSION_MAINTENANCE),0)
+                DESO_VERSION := $(PRODUCT_VERSION_MAJOR).$(PRODUCT_VERSION_MINOR)-$(TARGET_VENDOR_RELEASE_BUILD_ID)-$(DESO_BUILD)
             else
-                LINEAGE_VERSION := $(PRODUCT_VERSION_MAJOR).$(PRODUCT_VERSION_MINOR).$(LINEAGE_VERSION_MAINTENANCE)-$(TARGET_VENDOR_RELEASE_BUILD_ID)-$(LINEAGE_BUILD)
+                DESO_VERSION := $(PRODUCT_VERSION_MAJOR).$(PRODUCT_VERSION_MINOR).$(DESO_VERSION_MAINTENANCE)-$(TARGET_VENDOR_RELEASE_BUILD_ID)-$(DESO_BUILD)
             endif
         else
-            LINEAGE_VERSION := $(PRODUCT_VERSION_MAJOR).$(PRODUCT_VERSION_MINOR).$(PRODUCT_VERSION_MAINTENANCE)$(PRODUCT_VERSION_DEVICE_SPECIFIC)-$(LINEAGE_BUILD)
+            DESO_VERSION := $(PRODUCT_VERSION_MAJOR).$(PRODUCT_VERSION_MINOR).$(PRODUCT_VERSION_MAINTENANCE)$(PRODUCT_VERSION_DEVICE_SPECIFIC)-$(DESO_BUILD)
         endif
     endif
 else
-    ifeq ($(LINEAGE_VERSION_MAINTENANCE),0)
-        LINEAGE_VERSION := $(PRODUCT_VERSION_MAJOR).$(PRODUCT_VERSION_MINOR)-$(shell date -u +%Y%m%d)-$(LINEAGE_BUILDTYPE)$(LINEAGE_EXTRAVERSION)-$(LINEAGE_BUILD)
+    ifeq ($(DESO_VERSION_MAINTENANCE),0)
+        DESO_VERSION := $(PRODUCT_VERSION_MAJOR).$(PRODUCT_VERSION_MINOR)-$(shell date -u +%Y%m%d)-$(DESO_BUILDTYPE)$(DESO_EXTRAVERSION)-$(DESO_BUILD)
     else
-        LINEAGE_VERSION := $(PRODUCT_VERSION_MAJOR).$(PRODUCT_VERSION_MINOR).$(LINEAGE_VERSION_MAINTENANCE)-$(shell date -u +%Y%m%d)-$(LINEAGE_BUILDTYPE)$(LINEAGE_EXTRAVERSION)-$(LINEAGE_BUILD)
+        DESO_VERSION := $(PRODUCT_VERSION_MAJOR).$(PRODUCT_VERSION_MINOR).$(DESO_VERSION_MAINTENANCE)-$(shell date -u +%Y%m%d)-$(DESO_BUILDTYPE)$(DESO_EXTRAVERSION)-$(DESO_BUILD)
     endif
 endif
 
 PRODUCT_PROPERTY_OVERRIDES += \
-    ro.lineage.version=$(LINEAGE_VERSION) \
-    ro.lineage.releasetype=$(LINEAGE_BUILDTYPE) \
-    ro.lineage.build.version=$(PRODUCT_VERSION_MAJOR).$(PRODUCT_VERSION_MINOR) \
-    ro.modversion=$(LINEAGE_VERSION) \
-    ro.lineagelegal.url=https://lineageos.org/legal
+    ro.deso.version=$(DESO_VERSION) \
+    ro.deso.releasetype=$(DESO_BUILDTYPE) \
+    ro.deso.build.version=$(PRODUCT_VERSION_MAJOR).$(PRODUCT_VERSION_MINOR) \
+    ro.modversion=$(DESO_VERSION)
 
-PRODUCT_EXTRA_RECOVERY_KEYS += \
-    vendor/lineage/build/target/product/security/lineage
-
--include vendor/lineage-priv/keys/keys.mk
-
-LINEAGE_DISPLAY_VERSION := $(LINEAGE_VERSION)
-
-ifneq ($(PRODUCT_DEFAULT_DEV_CERTIFICATE),)
-ifneq ($(PRODUCT_DEFAULT_DEV_CERTIFICATE),build/target/product/security/testkey)
-    ifneq ($(LINEAGE_BUILDTYPE), UNOFFICIAL)
-        ifndef TARGET_VENDOR_RELEASE_BUILD_ID
-            ifneq ($(LINEAGE_EXTRAVERSION),)
-                # Remove leading dash from LINEAGE_EXTRAVERSION
-                LINEAGE_EXTRAVERSION := $(shell echo $(LINEAGE_EXTRAVERSION) | sed 's/-//')
-                TARGET_VENDOR_RELEASE_BUILD_ID := $(LINEAGE_EXTRAVERSION)
-            else
-                TARGET_VENDOR_RELEASE_BUILD_ID := $(shell date -u +%Y%m%d)
-            endif
-        else
-            TARGET_VENDOR_RELEASE_BUILD_ID := $(TARGET_VENDOR_RELEASE_BUILD_ID)
-        endif
-        ifeq ($(LINEAGE_VERSION_MAINTENANCE),0)
-            LINEAGE_DISPLAY_VERSION := $(PRODUCT_VERSION_MAJOR).$(PRODUCT_VERSION_MINOR)-$(TARGET_VENDOR_RELEASE_BUILD_ID)-$(LINEAGE_BUILD)
-        else
-            LINEAGE_DISPLAY_VERSION := $(PRODUCT_VERSION_MAJOR).$(PRODUCT_VERSION_MINOR).$(LINEAGE_VERSION_MAINTENANCE)-$(TARGET_VENDOR_RELEASE_BUILD_ID)-$(LINEAGE_BUILD)
-        endif
-    endif
-endif
-endif
+DESO_DISPLAY_VERSION := $(DESO_VERSION)
 
 PRODUCT_PROPERTY_OVERRIDES += \
-    ro.lineage.display.version=$(LINEAGE_DISPLAY_VERSION)
+    ro.deso.display.version=$(DESO_DISPLAY_VERSION)
 
 -include $(WORKSPACE)/build_env/image-auto-bits.mk
--include vendor/lineage/config/partner_gms.mk
--include vendor/cyngn/product.mk
+-include vendor/deso/config/partner_gms.mk
 
 $(call prepend-product-if-exists, vendor/extra/product.mk)

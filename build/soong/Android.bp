@@ -1,3 +1,4 @@
+﻿
 bootstrap_go_package {
     name: "soong-lineage",
     pkgPath: "lineage/soong/android",
