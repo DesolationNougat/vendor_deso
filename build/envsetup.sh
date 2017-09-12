@@ -254,6 +254,12 @@ function fixup_common_out_dir() {
     fi
 }
 
+function repopick() {
+    T=$(gettop)
+    $T/vendor/deso/build/tools/repopick.py $@
+}
+
+
 # Enable SD-LLVM if available
 if [ -d $(gettop)/prebuilts/snapdragon-llvm/toolchains ]; then
     case `uname -s` in
