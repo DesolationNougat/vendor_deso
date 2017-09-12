@@ -46,7 +46,7 @@ function brunch()
 {
     breakfast $*
     if [ $? -eq 0 ]; then
-        mka bacon
+        mka deso
     else
         echo "No such item in brunch menu. Try 'breakfast'"
         return 1
