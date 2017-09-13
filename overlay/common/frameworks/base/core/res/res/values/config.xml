@@ -61,7 +61,7 @@
     <bool name="config_enableLockScreenRotation">true</bool>
 
     <!-- Whether to persist the notification for when a usb drive device is plugged in -->
-    <!--<bool name="config_persistUsbDriveNotification">true</bool>-->
+    <bool name="config_persistUsbDriveNotification">true</bool>
 
     <!-- Set this to true to enable the platform's auto-power-save modes like doze and
          app standby.  These are not enabled by default because they require a standard
